@@ -234,6 +234,10 @@ export default function Home() {
                     {" "}das 19:00Hs às 21:00Hs
                   </span>
                 </p>
+                <p className="text-gray-300 text-xs sm:text-sm mt-1 leading-relaxed">
+                  Na CEM Professor Orlando Pereira, Avenida Loderites da Rosa Correia,
+                  nº 550 N, no Módulo 04
+                </p>
               </div>
               <motion.span
                 className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-green-400"
