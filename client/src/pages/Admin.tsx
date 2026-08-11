@@ -9,17 +9,29 @@ import { Spinner } from "@/components/ui/spinner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
-import { Download, FileText, LogOut, Lock } from "lucide-react";
+import { Download, FileText, LogOut, Lock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { exportModalidadesReport } from "@/lib/pdfReport";
 import type { ReportInscricao } from "@/lib/pdfReport";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useState } from "react";
 
+const MODALIDADES = [
+  { id: "futsal-m", label: "Futsal Masculino", categoria: "Futsal" },
+  { id: "futsal-f", label: "Futsal Feminino", categoria: "Futsal" },
+  { id: "voleibol-m", label: "Voleibol Masculino", categoria: "Voleibol" },
+  { id: "voleibol-f", label: "Voleibol Feminino", categoria: "Voleibol" },
+  { id: "basquete-m", label: "Basquetebol Arremesso Masculino", categoria: "Basquetebol" },
+  { id: "basquete-f", label: "Basquetebol Arremesso Feminino", categoria: "Basquetebol" },
+  { id: "corrida-m", label: "Corrida de Rua Masculina", categoria: "Corrida" },
+  { id: "corrida-f", label: "Corrida de Rua Feminina", categoria: "Corrida" },
+];
+
 export default function Admin() {
   const { user, isAuthenticated, logout } = useAuth();
   const [, setLocation] = useLocation();
   const [categoria, setCategoria] = useState("Todas");
+  const [modalidade, setModalidade] = useState("");
   const { data: inscricoes, isLoading } = trpc.inscricoes.list.useQuery(undefined, {
     enabled: isAuthenticated && user?.role === "admin",
   });
@@ -313,6 +325,121 @@ export default function Admin() {
                   Emitir Relatório
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Inscritos por modalidade */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.28 }}
+        >
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Users className="w-5 h-5 text-blue-400" />
+                Inscritos por Modalidade
+              </CardTitle>
+              <CardDescription className="text-gray-300">
+                Selecione a modalidade para ver os nomes dos inscritos e a quantidade
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-3 items-end mb-4">
+                <div className="space-y-2 flex-1">
+                  <Label htmlFor="modalidade" className="text-white">
+                    Modalidade
+                  </Label>
+                  <Select value={modalidade} onValueChange={setModalidade}>
+                    <SelectTrigger
+                      id="modalidade"
+                      className="bg-white/10 border-white/20 text-white"
+                    >
+                      <SelectValue placeholder="Selecione a modalidade" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-white/20">
+                      {MODALIDADES.map((mod) => (
+                        <SelectItem key={mod.id} value={mod.id} className="text-white">
+                          {mod.label} ({mod.categoria})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {modalidade ? (
+                (() => {
+                  const inscritos = (porModalidade ?? []).filter(
+                    (row) => row.modalidade === modalidade
+                  );
+                  const modInfo = MODALIDADES.find((m) => m.id === modalidade);
+                  return (
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-white font-semibold">
+                          {modInfo?.label}
+                        </h3>
+                        <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-lg text-sm font-semibold">
+                          {inscritos.length}{" "}
+                          {inscritos.length === 1 ? "inscrito" : "inscritos"}
+                        </span>
+                      </div>
+                      {inscritos.length > 0 ? (
+                        <div className="overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="border-white/10 hover:bg-white/5">
+                                <TableHead className="text-gray-300">#</TableHead>
+                                <TableHead className="text-gray-300">Nome</TableHead>
+                                <TableHead className="text-gray-300">Modalidade</TableHead>
+                                <TableHead className="text-gray-300">Setor</TableHead>
+                                <TableHead className="text-gray-300">Telefone</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {inscritos.map((row, i) => (
+                                <TableRow
+                                  key={`${row.inscricao.id}-${row.modalidade}`}
+                                  className="border-white/10 hover:bg-white/5 transition-colors"
+                                >
+                                  <TableCell className="text-gray-400">{i + 1}</TableCell>
+                                  <TableCell className="text-white font-medium">
+                                    {row.inscricao.nomeCompleto}
+                                  </TableCell>
+                                  <TableCell className="text-gray-300">
+                                    {modInfo?.label}
+                                  </TableCell>
+                                  <TableCell className="text-gray-300">
+                                    {row.inscricao.setor}
+                                  </TableCell>
+                                  <TableCell className="text-gray-300">
+                                    {row.inscricao.telefone}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-gray-300">
+                            Nenhum inscrito nesta modalidade
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-300">
+                    Selecione uma modalidade para visualizar os inscritos
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>
