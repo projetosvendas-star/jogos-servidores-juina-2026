@@ -1,5 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { startLogin } from "@/const";
+import { LoginForm } from "@/components/LoginForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -21,7 +21,7 @@ export default function Admin() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center px-4">
         <motion.div
-          className="text-center max-w-md"
+          className="text-center max-w-md w-full"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -38,27 +38,24 @@ export default function Admin() {
           >
             <Lock className="w-16 h-16 text-yellow-400" />
           </motion.div>
-          <h1 className="text-3xl font-bold text-white mb-4">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Painel Administrativo
           </h1>
           <p className="text-gray-300 mb-8">
-            Você precisa estar autenticado para acessar o painel administrativo dos Jogos dos Servidores.
+            Entre com sua conta para acessar o painel dos Jogos dos Servidores.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              onClick={() => startLogin()}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3"
-            >
-              Fazer Login
-            </Button>
-            <Button
-              onClick={() => setLocation("/")}
-              variant="outline"
-              className="border-white text-white hover:bg-white/10"
-            >
-              Voltar
-            </Button>
-          </div>
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 shadow-2xl">
+            <CardContent className="pt-6">
+              <LoginForm />
+            </CardContent>
+          </Card>
+          <Button
+            onClick={() => setLocation("/")}
+            variant="outline"
+            className="mt-6 border-white text-white hover:bg-white/10"
+          >
+            Voltar ao site
+          </Button>
         </motion.div>
       </div>
     );

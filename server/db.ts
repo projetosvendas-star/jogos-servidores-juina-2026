@@ -55,7 +55,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
+    } else if (user.openId === ENV.ownerOpenId || user.email === ENV.ownerEmail) {
       values.role = 'admin';
       updateSet.role = 'admin';
     }
@@ -88,6 +88,32 @@ export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+export type UserUpdate = {
+  name?: string | null;
+  email?: string | null;
+  loginMethod?: string | null;
+  role?: "user" | "admin";
+  lastSignedIn?: Date;
+};
+
+export async function updateUser(openId: string, updates: UserUpdate): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update user: database not available");
+    return;
+  }
+
+  const set: Record<string, unknown> = {};
+  if (updates.name !== undefined) set.name = updates.name;
+  if (updates.email !== undefined) set.email = updates.email;
+  if (updates.loginMethod !== undefined) set.loginMethod = updates.loginMethod;
+  if (updates.role !== undefined) set.role = updates.role;
+  if (updates.lastSignedIn !== undefined) set.lastSignedIn = updates.lastSignedIn;
+  if (Object.keys(set).length === 0) return;
+
+  await db.update(users).set(set).where(eq(users.openId, openId));
 }
 
 export async function createInscricao(inscricao: InsertInscricao) {

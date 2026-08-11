@@ -1,8 +1,9 @@
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
+import { isSupabaseAuthConfigured, loginWithPassword, signUpWithEmail } from "./_core/supabaseAuth";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
-import { createInscricao, getInscricoes } from "./db";
+import { createInscricao, getInscricoes, upsertUser } from "./db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -61,6 +62,85 @@ export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    login: publicProcedure
+      .input(z.object({ email: z.string().email("Email inválido"), password: z.string().min(6, "Senha muito curta") }))
+      .mutation(async ({ ctx, input }) => {
+        if (!isSupabaseAuthConfigured()) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Autenticação não configurada',
+          });
+        }
+        let session;
+        try {
+          session = await loginWithPassword(input.email, input.password);
+        } catch (error) {
+          console.error("[Auth] Login failed:", error);
+          throw new TRPCError({
+            code: 'UNAUTHORIZED',
+            message: 'Email ou senha inválidos',
+          });
+        }
+        const supabaseUser = session.supabaseUser;
+        await upsertUser({
+          openId: supabaseUser.id,
+          name:
+            (supabaseUser.user_metadata?.name as string | undefined) ??
+            supabaseUser.email ??
+            null,
+          email: supabaseUser.email ?? null,
+          loginMethod: 'supabase',
+          lastSignedIn: new Date(),
+        });
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, session.accessToken, {
+          ...cookieOptions,
+          maxAge: ONE_YEAR_MS,
+        });
+        return { success: true } as const;
+      }),
+    register: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email("Email inválido"),
+          password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+          name: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!isSupabaseAuthConfigured()) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Autenticação não configurada',
+          });
+        }
+        let result;
+        try {
+          result = await signUpWithEmail(input.email, input.password, input.name);
+        } catch (error) {
+          console.error("[Auth] Signup failed:", error);
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: error instanceof Error ? error.message : 'Falha ao criar conta',
+          });
+        }
+        if (result.needsConfirmation || !result.accessToken || !result.supabaseUser) {
+          return { success: true, needsConfirmation: true } as const;
+        }
+        await upsertUser({
+          openId: result.supabaseUser.id,
+          name: input.name ?? input.email,
+          email: input.email,
+          loginMethod: 'supabase',
+          lastSignedIn: new Date(),
+        });
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, result.accessToken, {
+          ...cookieOptions,
+          maxAge: ONE_YEAR_MS,
+        });
+        return { success: true, needsConfirmation: false } as const;
+      }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
