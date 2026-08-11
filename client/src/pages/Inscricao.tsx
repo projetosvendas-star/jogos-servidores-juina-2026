@@ -114,10 +114,10 @@ export default function Inscricao() {
         seguimento: data.seguimento,
         telefone: data.telefone,
         consentimentoDados: 1,
-        modalidades: selectedModalidades as unknown as string,
+        modalidades: JSON.stringify(selectedModalidades),
       });
 
-      toast.success("Inscrição realizada com sucesso! 🎉");
+      toast.success("Registro gravado!");
       setTimeout(() => setLocation("/"), 2000);
     } catch (error) {
       toast.error("Erro ao realizar inscrição. Tente novamente.");

@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { Download, FileText, LogOut, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { exportModalidadesReport } from "@/lib/pdfReport";
+import type { ReportInscricao } from "@/lib/pdfReport";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useState } from "react";
 
@@ -20,6 +21,9 @@ export default function Admin() {
   const [, setLocation] = useLocation();
   const [categoria, setCategoria] = useState("Todas");
   const { data: inscricoes, isLoading } = trpc.inscricoes.list.useQuery(undefined, {
+    enabled: isAuthenticated && user?.role === "admin",
+  });
+  const { data: porModalidade } = trpc.inscricoes.porModalidade.useQuery(undefined, {
     enabled: isAuthenticated && user?.role === "admin",
   });
 
@@ -130,13 +134,20 @@ export default function Admin() {
   };
 
   const handleExportPDF = (filtroCategoria?: string) => {
-    if (!inscricoes || inscricoes.length === 0) {
+    const reportData: ReportInscricao[] = porModalidade
+      ? porModalidade.map((row) => ({
+          ...row.inscricao,
+          modalidadeRecords: [row.modalidade],
+        }))
+      : (inscricoes as ReportInscricao[] | undefined) ?? [];
+
+    if (reportData.length === 0) {
       toast.error("Nenhuma inscrição para exportar");
       return;
     }
     try {
       exportModalidadesReport(
-        inscricoes,
+        reportData,
         filtroCategoria && filtroCategoria !== "Todas" ? filtroCategoria : undefined
       );
       toast.success("Relatório PDF gerado com sucesso!");

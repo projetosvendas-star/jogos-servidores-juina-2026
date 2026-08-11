@@ -3,7 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { isSupabaseAuthConfigured, loginWithPassword, signUpWithEmail } from "./_core/supabaseAuth";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
-import { createInscricao, getInscricoes, upsertUser } from "./db";
+import { createInscricao, getInscricoes, getInscricoesByModalidade, upsertUser } from "./db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -233,6 +233,24 @@ export const appRouter = router({
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: 'Erro ao buscar inscrições',
+          });
+        }
+      }),
+    porModalidade: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user?.role !== 'admin') {
+          throw new TRPCError({
+            code: 'FORBIDDEN',
+            message: 'Acesso negado',
+          });
+        }
+        try {
+          return await getInscricoesByModalidade();
+        } catch (error) {
+          console.error("[Inscricoes] Error fetching inscriptions by modality:", error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Erro ao buscar inscrições por modalidade',
           });
         }
       }),

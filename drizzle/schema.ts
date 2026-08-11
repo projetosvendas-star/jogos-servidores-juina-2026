@@ -6,6 +6,7 @@ import {
   text,
   timestamp,
   varchar,
+  index,
 } from "drizzle-orm/pg-core";
 
 export const roleEnum = pgEnum("role", ["user", "admin"]);
@@ -55,3 +56,23 @@ export const inscricoes = pgTable("inscricoes", {
 
 export type Inscricao = typeof inscricoes.$inferSelect;
 export type InsertInscricao = typeof inscricoes.$inferInsert;
+
+/**
+ * Registros normalizados por modalidade: uma linha por modalidade inscrita.
+ * Facilita a geração de relatórios por modalidade/categoria.
+ */
+export const inscricaoModalidades = pgTable(
+  "inscricao_modalidades",
+  {
+    id: serial("id").primaryKey(),
+    inscricaoId: integer("inscricaoId")
+      .notNull()
+      .references(() => inscricoes.id, { onDelete: "cascade" }),
+    modalidade: varchar("modalidade", { length: 50 }).notNull(),
+    createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [index("inscricao_modalidades_modalidade_idx").on(table.modalidade)]
+);
+
+export type InscricaoModalidade = typeof inscricaoModalidades.$inferSelect;
+export type InsertInscricaoModalidade = typeof inscricaoModalidades.$inferInsert;

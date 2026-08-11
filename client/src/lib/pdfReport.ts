@@ -10,6 +10,12 @@ export interface ReportInscricao {
   telefone: string;
   modalidades: string;
   createdAt: string | Date;
+  modalidadeRecords?: string[];
+}
+
+export interface ReportByModalidadeRow {
+  inscricao: ReportInscricao;
+  modalidade: string;
 }
 
 const MODALIDADES = [
@@ -37,6 +43,21 @@ interface CategoriaGroup {
   participations: Participation[];
 }
 
+function getModalidadeIds(insc: ReportInscricao): string[] {
+  if (insc.modalidadeRecords && insc.modalidadeRecords.length > 0) {
+    return insc.modalidadeRecords.filter((id) => modalidadeInfo(id));
+  }
+  try {
+    const parsed = JSON.parse(insc.modalidades);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((id): id is string => typeof id === "string" && !!modalidadeInfo(id));
+    }
+  } catch {
+    // modalidade inválida/legado: ignora
+  }
+  return [];
+}
+
 export function exportModalidadesReport(
   inscricoes: ReportInscricao[],
   categoria?: string
@@ -45,13 +66,7 @@ export function exportModalidadesReport(
 
   const groups: Record<string, CategoriaGroup> = {};
   for (const insc of inscricoes) {
-    let ids: string[] = [];
-    try {
-      const parsed = JSON.parse(insc.modalidades);
-      if (Array.isArray(parsed)) ids = parsed.filter((id) => typeof id === "string");
-    } catch {
-      // modalidade inválida/legado: ignora
-    }
+    const ids = getModalidadeIds(insc);
     for (const id of ids) {
       const info = modalidadeInfo(id);
       if (!info) continue;
