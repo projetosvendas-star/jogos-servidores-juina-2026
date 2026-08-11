@@ -12,6 +12,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { SiteFooter } from "@/components/SiteFooter";
 
 const SETORES = [
   "Administração",
@@ -69,6 +70,7 @@ export default function Inscricao() {
   const isLoading = createInscricao.isPending;
   const setor = watch("setor");
   const consentimento = watch("consentimentoDados");
+  const efetivo = watch("efetivo");
 
   const validateForm = (data: FormData): boolean => {
     const newErrors: Record<string, string> = {};
@@ -89,6 +91,10 @@ export default function Inscricao() {
 
     if (selectedModalidades.length === 0) {
       newErrors.modalidades = "Selecione pelo menos uma modalidade esportiva";
+    }
+
+    if (data.efetivo === "Não" && !data.seguimento) {
+      newErrors.seguimento = "Seguimento é obrigatório";
     }
 
     if (!data.consentimentoDados) {
@@ -240,9 +246,16 @@ export default function Inscricao() {
                 <motion.div className="space-y-3" variants={itemVariants}>
                   <Label className="text-white">Efetivo *</Label>
                   <RadioGroup
-                    onValueChange={(value) =>
-                      setValue("efetivo", value as "Sim" | "Não")
-                    }
+                    onValueChange={(value) => {
+                      setValue("efetivo", value as "Sim" | "Não");
+                      if (value === "Não") {
+                        setErrors((prev) => {
+                          const newErrors = { ...prev };
+                          delete newErrors.seguimento;
+                          return newErrors;
+                        });
+                      }
+                    }}
                     defaultValue="Sim"
                   >
                     <div className="flex items-center space-x-2">
@@ -261,31 +274,52 @@ export default function Inscricao() {
                 </motion.div>
 
                 {/* Seguimento */}
-                <motion.div className="space-y-2" variants={itemVariants}>
-                  <Label htmlFor="seguimento" className="text-white">
-                    Seguimento *
-                  </Label>
-                  <Select
-                    onValueChange={(value) =>
-                      setValue("seguimento", value as "Seletivo" | "Coopervale" | "Ágape")
-                    }
+                {efetivo === "Não" && (
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                      <SelectValue placeholder="Selecione o seguimento" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-white/20">
-                      <SelectItem value="Seletivo" className="text-white">
-                        Seletivo
-                      </SelectItem>
-                      <SelectItem value="Coopervale" className="text-white">
-                        Coopervale
-                      </SelectItem>
-                      <SelectItem value="Ágape" className="text-white">
-                        Ágape
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </motion.div>
+                    <Label htmlFor="seguimento" className="text-white">
+                      Seguimento *
+                    </Label>
+                    <Select
+                      onValueChange={(value) => {
+                        setValue("seguimento", value as "Seletivo" | "Coopervale" | "Ágape");
+                        if (value) {
+                          setErrors((prev) => {
+                            const newErrors = { ...prev };
+                            delete newErrors.seguimento;
+                            return newErrors;
+                          });
+                        }
+                      }}
+                    >
+                      <SelectTrigger
+                        className={`bg-white/10 border-white/20 text-white ${
+                          errors.seguimento ? "border-red-500" : ""
+                        }`}
+                      >
+                        <SelectValue placeholder="Selecione o seguimento" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-900 border-white/20">
+                        <SelectItem value="Seletivo" className="text-white">
+                          Seletivo
+                        </SelectItem>
+                        <SelectItem value="Coopervale" className="text-white">
+                          Coopervale
+                        </SelectItem>
+                        <SelectItem value="Ágape" className="text-white">
+                          Ágape
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {errors.seguimento && (
+                      <p className="text-red-400 text-sm">{errors.seguimento}</p>
+                    )}
+                  </motion.div>
+                )}
 
                 {/* Telefone */}
                 <motion.div className="space-y-2" variants={itemVariants}>
@@ -410,6 +444,7 @@ export default function Inscricao() {
             </CardContent>
           </Card>
         </motion.div>
+        <SiteFooter />
       </motion.div>
     </div>
   );

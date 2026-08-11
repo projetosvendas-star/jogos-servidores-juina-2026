@@ -7,8 +7,10 @@ import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Spinner } from "@/components/ui/spinner";
 import { motion } from "framer-motion";
-import { Download, LogOut, Lock } from "lucide-react";
+import { Download, FileText, LogOut, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { exportModalidadesReport } from "@/lib/pdfReport";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export default function Admin() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -123,6 +125,20 @@ export default function Admin() {
     toast.success("Inscrições exportadas com sucesso!");
   };
 
+  const handleExportPDF = () => {
+    if (!inscricoes || inscricoes.length === 0) {
+      toast.error("Nenhuma inscrição para exportar");
+      return;
+    }
+    try {
+      exportModalidadesReport(inscricoes);
+      toast.success("Relatório PDF gerado com sucesso!");
+    } catch (error) {
+      console.error("[Admin] Erro ao gerar PDF:", error);
+      toast.error("Erro ao gerar o relatório PDF");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <motion.div
@@ -147,6 +163,13 @@ export default function Admin() {
             </p>
           </div>
           <div className="flex gap-2">
+            <Button
+              onClick={handleExportPDF}
+              className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              Exportar PDF
+            </Button>
             <Button
               onClick={handleExport}
               className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
@@ -299,6 +322,7 @@ export default function Admin() {
           </Card>
         </motion.div>
       </motion.div>
+      <SiteFooter />
     </div>
   );
 }

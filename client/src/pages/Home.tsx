@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Trophy, Zap, Shield, Users } from "lucide-react";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -30,7 +31,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden flex flex-col">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -58,7 +59,7 @@ export default function Home() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center max-w-4xl mx-auto"
           variants={containerVariants}
@@ -211,6 +212,8 @@ export default function Home() {
           </motion.div>
         </motion.div>
       </div>
+
+      <SiteFooter />
     </div>
   );
 }
