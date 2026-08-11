@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { Download, FileText, LogOut, Lock, Users } from "lucide-react";
 import { toast } from "sonner";
-import { exportModalidadesReport } from "@/lib/pdfReport";
+import { exportModalidadesReport, exportModalidadeReport } from "@/lib/pdfReport";
 import type { ReportInscricao } from "@/lib/pdfReport";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useState } from "react";
@@ -30,7 +30,6 @@ const MODALIDADES = [
 export default function Admin() {
   const { user, isAuthenticated, logout } = useAuth();
   const [, setLocation] = useLocation();
-  const [categoria, setCategoria] = useState("Todas");
   const [modalidade, setModalidade] = useState("");
   const { data: inscricoes, isLoading } = trpc.inscricoes.list.useQuery(undefined, {
     enabled: isAuthenticated && user?.role === "admin",
@@ -169,6 +168,25 @@ export default function Admin() {
     }
   };
 
+  const handleExportPDFModalidade = () => {
+    if (!modalidade) {
+      toast.error("Selecione uma modalidade para emitir o relatório");
+      return;
+    }
+    const rows = (porModalidade ?? []).filter((r) => r.modalidade === modalidade);
+    if (rows.length === 0) {
+      toast.error("Nenhum inscrito nesta modalidade para exportar");
+      return;
+    }
+    try {
+      exportModalidadeReport(porModalidade ?? [], modalidade);
+      toast.success("Relatório PDF gerado com sucesso!");
+    } catch (error) {
+      console.error("[Admin] Erro ao gerar PDF:", error);
+      toast.error("Erro ao gerar o relatório PDF");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <motion.div
@@ -268,67 +286,6 @@ export default function Admin() {
           </Card>
         </motion.div>
 
-        {/* Relatório por categoria */}
-        <motion.div
-          className="mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.25 }}
-        >
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <FileText className="w-5 h-5 text-red-400" />
-                Relatório por Categoria de Modalidade
-              </CardTitle>
-              <CardDescription className="text-gray-300">
-                Escolha a categoria e emita o relatório em PDF
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row gap-3 items-end">
-                <div className="space-y-2 flex-1">
-                  <Label htmlFor="categoria" className="text-white">
-                    Categoria da Modalidade
-                  </Label>
-                  <Select value={categoria} onValueChange={setCategoria}>
-                    <SelectTrigger
-                      id="categoria"
-                      className="bg-white/10 border-white/20 text-white"
-                    >
-                      <SelectValue placeholder="Selecione a categoria" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-white/20">
-                      <SelectItem value="Todas" className="text-white">
-                        Todas
-                      </SelectItem>
-                      <SelectItem value="Futsal" className="text-white">
-                        Futsal
-                      </SelectItem>
-                      <SelectItem value="Voleibol" className="text-white">
-                        Voleibol
-                      </SelectItem>
-                      <SelectItem value="Basquetebol" className="text-white">
-                        Basquetebol
-                      </SelectItem>
-                      <SelectItem value="Corrida" className="text-white">
-                        Corrida
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button
-                  onClick={() => handleExportPDF(categoria)}
-                  className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
-                >
-                  <FileText className="w-4 h-4" />
-                  Emitir Relatório
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
         {/* Inscritos por modalidade */}
         <motion.div
           className="mb-8"
@@ -368,6 +325,14 @@ export default function Admin() {
                     </SelectContent>
                   </Select>
                 </div>
+                <Button
+                  onClick={handleExportPDFModalidade}
+                  disabled={!modalidade}
+                  className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
+                >
+                  <FileText className="w-4 h-4" />
+                  Emitir Relatório PDF
+                </Button>
               </div>
 
               {modalidade ? (

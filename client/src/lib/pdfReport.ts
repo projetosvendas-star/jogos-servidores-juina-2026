@@ -210,3 +210,104 @@ export function exportModalidadesReport(
 
   doc.save(`relatorio-modalidades-${new Date().toISOString().split("T")[0]}.pdf`);
 }
+
+export function exportModalidadeReport(
+  rows: ReportByModalidadeRow[],
+  modalidadeId: string
+): void {
+  const info = modalidadeInfo(modalidadeId);
+  const inscritos = rows.filter((r) => r.modalidade === modalidadeId);
+
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+  // Header
+  doc.setFillColor(15, 23, 42);
+  doc.rect(0, 0, 210, 34, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.text("Jogos dos Servidores Públicos / Juína-MT 2026", 105, 14, { align: "center" });
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Relatório de Inscritos — ${info?.label ?? modalidadeId}`, 105, 22, {
+    align: "center",
+  });
+  doc.setFontSize(9);
+  doc.text(
+    `Gerado em ${new Date().toLocaleString("pt-BR")} — Total de inscritos: ${inscritos.length}`,
+    105,
+    29,
+    { align: "center" }
+  );
+
+  let y = 44;
+
+  if (inscritos.length === 0) {
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text("Nenhum inscrito encontrado.", 105, y, { align: "center" });
+  } else {
+    autoTable(doc, {
+      startY: y,
+      margin: { left: 14, right: 14 },
+      head: [["#", "Nome", "Setor", "Efetivo", "Seguimento", "Telefone"]],
+      body: inscritos.map((r, i) => [
+        String(i + 1),
+        r.inscricao.nomeCompleto,
+        r.inscricao.setor,
+        r.inscricao.efetivo,
+        r.inscricao.seguimento,
+        r.inscricao.telefone,
+      ]),
+      styles: {
+        font: "helvetica",
+        fontSize: 9,
+        cellPadding: 2,
+        textColor: [30, 30, 30],
+        lineColor: [200, 200, 200],
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fillColor: [51, 65, 85],
+        textColor: 255,
+        fontStyle: "bold",
+      },
+      alternateRowStyles: { fillColor: [241, 245, 249] },
+      columnStyles: {
+        0: { cellWidth: 10, halign: "center" },
+        1: { cellWidth: 55 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 18, halign: "center" },
+        4: { cellWidth: 25 },
+        5: { cellWidth: 30 },
+      },
+    });
+
+    y = (doc as unknown as { lastAutoTable?: { finalY?: number } }).lastAutoTable?.finalY ?? y;
+  }
+
+  // Summary
+  if (y > 240) {
+    doc.addPage();
+    y = 20;
+  }
+  doc.setFillColor(15, 23, 42);
+  doc.rect(14, y + 6, 182, 8, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text(`Resumo — ${info?.label ?? modalidadeId}`, 18, y + 11);
+  autoTable(doc, {
+    startY: y + 18,
+    margin: { left: 14, right: 14 },
+    head: [["Descrição", "Total"]],
+    body: [["Total de inscritos", String(inscritos.length)]],
+    styles: { fontSize: 9.5, cellPadding: 2 },
+    headStyles: { fillColor: [51, 65, 85], textColor: 255, fontStyle: "bold" },
+    columnStyles: { 1: { cellWidth: 30, halign: "center" } },
+  });
+
+  const slug = (info?.label ?? modalidadeId).toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  doc.save(`relatorio-${slug}-${new Date().toISOString().split("T")[0]}.pdf`);
+}
