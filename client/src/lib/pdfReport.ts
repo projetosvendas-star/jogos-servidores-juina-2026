@@ -37,7 +37,10 @@ interface CategoriaGroup {
   participations: Participation[];
 }
 
-export function exportModalidadesReport(inscricoes: ReportInscricao[]): void {
+export function exportModalidadesReport(
+  inscricoes: ReportInscricao[],
+  categoria?: string
+): void {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
   const groups: Record<string, CategoriaGroup> = {};
@@ -60,9 +63,9 @@ export function exportModalidadesReport(inscricoes: ReportInscricao[]): void {
   }
 
   const order = ["Futsal", "Voleibol", "Basquetebol", "Corrida"];
-  const sorted = Object.values(groups).sort(
-    (a, b) => order.indexOf(a.categoria) - order.indexOf(b.categoria)
-  );
+  const sorted = Object.values(groups)
+    .filter((g) => !categoria || g.categoria === categoria)
+    .sort((a, b) => order.indexOf(a.categoria) - order.indexOf(b.categoria));
 
   const totalParticipations = sorted.reduce((acc, g) => acc + g.participations.length, 0);
 
@@ -72,10 +75,17 @@ export function exportModalidadesReport(inscricoes: ReportInscricao[]): void {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
-  doc.text("Jogos dos Servidores Público / Juína-MT 2026", 105, 14, { align: "center" });
+  doc.text("Jogos dos Servidores Públicos / Juína-MT 2026", 105, 14, { align: "center" });
   doc.setFontSize(12);
   doc.setFont("helvetica", "normal");
-  doc.text("Relatório de Inscrições por Categoria de Modalidade", 105, 22, { align: "center" });
+  doc.text(
+    categoria
+      ? `Relatório de Inscrições — Categoria: ${categoria}`
+      : "Relatório de Inscrições por Categoria de Modalidade",
+    105,
+    22,
+    { align: "center" }
+  );
   doc.setFontSize(9);
   doc.text(
     `Gerado em ${new Date().toLocaleString("pt-BR")} — Total de inscritos: ${inscricoes.length} | Total de participações: ${totalParticipations}`,

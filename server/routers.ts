@@ -8,15 +8,15 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 const SETORES = [
-  "Administração",
+  "Administração(Prefeitura todos os setores)",
   "Educação",
   "Saúde",
   "Infraestrutura",
-  "Segurança",
   "Assistência Social",
   "Cultura",
-  "Meio Ambiente",
-  "Desenvolvimento Econômico",
+  "Daes",
+  "Secretaria de Agricultura",
+  "Secretaria de Esporte",
 ];
 
 const MODALIDADES_VALIDAS = [

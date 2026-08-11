@@ -6,15 +6,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Spinner } from "@/components/ui/spinner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { Download, FileText, LogOut, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { exportModalidadesReport } from "@/lib/pdfReport";
 import { SiteFooter } from "@/components/SiteFooter";
+import { useState } from "react";
 
 export default function Admin() {
   const { user, isAuthenticated, logout } = useAuth();
   const [, setLocation] = useLocation();
+  const [categoria, setCategoria] = useState("Todas");
   const { data: inscricoes, isLoading } = trpc.inscricoes.list.useQuery(undefined, {
     enabled: isAuthenticated && user?.role === "admin",
   });
@@ -125,13 +129,16 @@ export default function Admin() {
     toast.success("Inscrições exportadas com sucesso!");
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = (filtroCategoria?: string) => {
     if (!inscricoes || inscricoes.length === 0) {
       toast.error("Nenhuma inscrição para exportar");
       return;
     }
     try {
-      exportModalidadesReport(inscricoes);
+      exportModalidadesReport(
+        inscricoes,
+        filtroCategoria && filtroCategoria !== "Todas" ? filtroCategoria : undefined
+      );
       toast.success("Relatório PDF gerado com sucesso!");
     } catch (error) {
       console.error("[Admin] Erro ao gerar PDF:", error);
@@ -164,7 +171,7 @@ export default function Admin() {
           </div>
           <div className="flex gap-2">
             <Button
-              onClick={handleExportPDF}
+              onClick={() => handleExportPDF()}
               className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
             >
               <FileText className="w-4 h-4" />
@@ -233,6 +240,67 @@ export default function Admin() {
             <CardContent>
               <div className="text-3xl font-bold text-orange-400">
                 {inscricoes?.filter((i) => i.efetivo === "Não").length || 0}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Relatório por categoria */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+        >
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <FileText className="w-5 h-5 text-red-400" />
+                Relatório por Categoria de Modalidade
+              </CardTitle>
+              <CardDescription className="text-gray-300">
+                Escolha a categoria e emita o relatório em PDF
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-3 items-end">
+                <div className="space-y-2 flex-1">
+                  <Label htmlFor="categoria" className="text-white">
+                    Categoria da Modalidade
+                  </Label>
+                  <Select value={categoria} onValueChange={setCategoria}>
+                    <SelectTrigger
+                      id="categoria"
+                      className="bg-white/10 border-white/20 text-white"
+                    >
+                      <SelectValue placeholder="Selecione a categoria" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-white/20">
+                      <SelectItem value="Todas" className="text-white">
+                        Todas
+                      </SelectItem>
+                      <SelectItem value="Futsal" className="text-white">
+                        Futsal
+                      </SelectItem>
+                      <SelectItem value="Voleibol" className="text-white">
+                        Voleibol
+                      </SelectItem>
+                      <SelectItem value="Basquetebol" className="text-white">
+                        Basquetebol
+                      </SelectItem>
+                      <SelectItem value="Corrida" className="text-white">
+                        Corrida
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  onClick={() => handleExportPDF(categoria)}
+                  className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
+                >
+                  <FileText className="w-4 h-4" />
+                  Emitir Relatório
+                </Button>
               </div>
             </CardContent>
           </Card>

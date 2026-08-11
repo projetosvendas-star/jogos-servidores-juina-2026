@@ -1,9 +1,14 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Trophy, Zap, Shield, Users } from "lucide-react";
 import { SiteFooter } from "@/components/SiteFooter";
+
+const orbitBalls = [
+  { emoji: "⚽", radius: 92, duration: 14, phase: 0, size: "text-4xl sm:text-5xl" },
+  { emoji: "🏀", radius: 70, duration: 9, phase: 90, size: "text-3xl sm:text-4xl" },
+  { emoji: "🏐", radius: 108, duration: 18, phase: 180, size: "text-4xl sm:text-5xl" },
+  { emoji: "🏈", radius: 82, duration: 11, phase: 270, size: "text-2xl sm:text-3xl" },
+];
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -66,29 +71,119 @@ export default function Home() {
           initial="hidden"
           animate="visible"
         >
-          {/* Trophy Icon */}
+          {/* Animated Center Scene */}
           <motion.div
-            className="flex justify-center mb-8"
-            animate={{
-              y: [0, -20, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-            }}
+            className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-[24rem] lg:h-[24rem] flex items-center justify-center mx-auto mb-10"
+            variants={itemVariants}
           >
+            {/* Outer rotating ring */}
             <motion.div
-              animate={{
-                scale: [1, 1.05, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-              }}
-              className="relative"
+              className="absolute inset-0 rounded-full border-2 border-dashed border-white/15"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+            />
+            {/* Inner rotating ring */}
+            <motion.div
+              className="absolute inset-6 rounded-full border-2 border-dashed border-white/10"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+            />
+
+            {/* Orbiting balls */}
+            {orbitBalls.map((ball, index) => (
+              <motion.div
+                key={index}
+                className="absolute inset-0"
+                animate={{ rotate: [ball.phase, ball.phase + 360] }}
+                transition={{
+                  duration: ball.duration,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              >
+                <motion.div
+                  className="absolute left-1/2 top-1/2"
+                  style={{ transform: `translateX(${ball.radius}px)` }}
+                >
+                  <motion.div
+                    className={`-translate-x-1/2 -translate-y-1/2 ${ball.size}`}
+                    animate={{ rotate: [-ball.phase, -ball.phase - 360] }}
+                    transition={{
+                      duration: ball.duration,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  >
+                    <span className="block drop-shadow-lg">{ball.emoji}</span>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            ))}
+
+            {/* Runner */}
+            <motion.div
+              className="relative z-10 flex flex-col items-center"
+              animate={{ y: [0, -30, 0] }}
+              transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
             >
-              <Trophy className="w-20 h-20 text-yellow-400 drop-shadow-lg" />
+              {/* Speed lines behind the runner */}
+              <motion.div
+                className="absolute right-full top-1/2 mr-2 flex items-center gap-1.5"
+                animate={{ opacity: [0, 0.8, 0], x: [-8, -28, -48] }}
+                transition={{ duration: 1.1, repeat: Infinity, ease: "linear" }}
+              >
+                {[24, 16, 10].map((w, i) => (
+                  <div
+                    key={i}
+                    className="h-1 rounded-full bg-gradient-to-l from-orange-400 to-transparent"
+                    style={{ width: `${w * 4}px` }}
+                  />
+                ))}
+              </motion.div>
+
+              <motion.span
+                className="text-7xl sm:text-8xl lg:text-9xl drop-shadow-[0_0_30px_rgba(251,191,36,0.45)]"
+                animate={{ rotate: [-6, 6, -6], scale: [1, 1.08, 1] }}
+                transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+              >
+                🏃
+              </motion.span>
+
+              {/* Ground shadow */}
+              <motion.div
+                className="mt-2 h-2 w-24 rounded-full bg-black/40 blur-sm"
+                animate={{ scaleX: [1, 0.6, 1], opacity: [0.6, 0.3, 0.6] }}
+                transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+              />
+
+              {/* Track line */}
+              <motion.div
+                className="mt-2 h-1 w-52 rounded-full bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                animate={{ x: [0, 10, 0] }}
+                transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+              />
             </motion.div>
+
+            {/* Floating sparkles */}
+            {["✦", "✦", "✦"].map((spark, index) => (
+              <motion.span
+                key={index}
+                className="absolute text-yellow-300/70 text-lg sm:text-xl"
+                style={{ top: `${15 + index * 30}%`, left: `${8 + index * 32}%` }}
+                animate={{
+                  y: [0, -14, 0],
+                  opacity: [0, 1, 0],
+                  rotate: [0, 90, 0],
+                }}
+                transition={{
+                  duration: 2.4,
+                  repeat: Infinity,
+                  delay: index * 0.4,
+                }}
+              >
+                {spark}
+              </motion.span>
+            ))}
           </motion.div>
 
           {/* Main Title */}
@@ -103,7 +198,7 @@ export default function Home() {
             className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 via-orange-400 to-red-400 bg-clip-text text-transparent mb-6"
             variants={itemVariants}
           >
-            Público / Juína-MT 2026
+            Públicos / Juína-MT 2026
           </motion.h2>
 
           {/* Subtitle */}
@@ -114,61 +209,33 @@ export default function Home() {
             Celebre a excelência, a competição e o espírito de equipe. Inscreva-se agora e faça parte da maior celebração esportiva de Juína!
           </motion.p>
 
-          {/* Features Grid */}
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
-            variants={containerVariants}
-          >
-            {[
-              {
-                icon: Trophy,
-                title: "Competição",
-                description: "Modalidades variadas",
-              },
-              {
-                icon: Users,
-                title: "Comunidade",
-                description: "Todos os setores",
-              },
-              {
-                icon: Zap,
-                title: "Energia",
-                description: "Espírito esportivo",
-              },
-              {
-                icon: Shield,
-                title: "Segurança",
-                description: "Dados protegidos",
-              },
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300"
-                variants={itemVariants}
-                whileHover={{
-                  scale: 1.05,
-                  backgroundColor: "rgba(255, 255, 255, 0.15)",
-                }}
-              >
-                <feature.icon className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-                <h3 className="text-white font-bold mb-2">{feature.title}</h3>
-                <p className="text-gray-300 text-sm">{feature.description}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-
           {/* CTA Buttons */}
           <motion.div
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
             variants={itemVariants}
           >
             <motion.div
-              whileHover={{ scale: 1.05 }}
+              className="relative"
+              animate={{ scale: [1, 1.06, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
             >
+              {/* Pulsing glow */}
+              <motion.div
+                className="absolute -inset-1.5 rounded-xl bg-gradient-to-r from-blue-500 via-orange-400 to-red-500 blur-lg"
+                animate={{ opacity: [0.5, 0.95, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              />
+              {/* Animated ring */}
+              <motion.div
+                className="absolute -inset-1.5 rounded-xl border-2 border-orange-400"
+                animate={{ scale: [1, 1.25, 1.5], opacity: [0.9, 0.4, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+              />
               <Button
                 onClick={() => setLocation("/inscricao")}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                className="relative bg-gradient-to-r from-blue-500 via-orange-400 to-red-500 hover:from-blue-600 hover:via-orange-500 hover:to-red-600 text-white font-bold py-4 px-10 rounded-xl text-lg shadow-2xl"
               >
                 Inscrever-se Agora
               </Button>
@@ -181,34 +248,11 @@ export default function Home() {
               <Button
                 onClick={() => setLocation("/admin")}
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white/10 font-bold py-3 px-8 rounded-lg text-lg transition-all duration-300"
+                className="border-2 border-white text-white hover:bg-white/10 font-bold py-4 px-8 rounded-xl text-lg transition-all duration-300"
               >
                 Painel Administrativo
               </Button>
             </motion.div>
-          </motion.div>
-
-          {/* Decorative Elements */}
-          <motion.div
-            className="mt-16 flex justify-center gap-4"
-            variants={containerVariants}
-          >
-            {["⚽", "🏐", "🏀", "🏃"].map((emoji, index) => (
-              <motion.div
-                key={index}
-                className="text-4xl"
-                animate={{
-                  y: [0, -10, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  delay: index * 0.2,
-                  repeat: Infinity,
-                }}
-              >
-                {emoji}
-              </motion.div>
-            ))}
           </motion.div>
         </motion.div>
       </div>
