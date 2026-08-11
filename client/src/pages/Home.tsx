@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
+import { Clock } from "lucide-react";
 import { SiteFooter } from "@/components/SiteFooter";
 
 const orbitBalls = [
@@ -208,6 +209,39 @@ export default function Home() {
           >
             Celebre a excelência, a competição e o espírito de equipe. Inscreva-se agora e faça parte da maior celebração esportiva de Juína!
           </motion.p>
+
+          {/* Training Notice */}
+          <motion.div
+            className="relative mb-12 max-w-xl mx-auto"
+            variants={itemVariants}
+          >
+            <motion.div
+              className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-blue-500/40 via-orange-400/40 to-red-500/40 blur-md"
+              animate={{ opacity: [0.4, 0.8, 0.4] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <div className="relative flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/25 rounded-2xl px-5 sm:px-6 py-4 shadow-lg">
+              <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-orange-500 shadow-inner">
+                <Clock className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="text-[11px] sm:text-xs font-semibold tracking-widest uppercase text-orange-300 mb-1">
+                  Treinamento
+                </p>
+                <p className="text-white font-bold text-sm sm:text-lg leading-snug">
+                  Toda Segunda-feiras e Quartas-feiras
+                  <span className="text-gray-300 font-medium">
+                    {" "}das 19:00Hs às 21:00Hs
+                  </span>
+                </p>
+              </div>
+              <motion.span
+                className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-green-400"
+                animate={{ opacity: [1, 0.2, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+            </div>
+          </motion.div>
 
           {/* CTA Buttons */}
           <motion.div
