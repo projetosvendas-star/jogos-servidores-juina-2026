@@ -74,7 +74,7 @@ export default function Home() {
         >
           {/* Animated Center Scene */}
           <motion.div
-            className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-[24rem] lg:h-[24rem] flex items-center justify-center mx-auto mb-10"
+            className="relative w-56 h-56 sm:w-72 sm:h-72 lg:w-80 lg:h-80 flex items-center justify-center mx-auto mb-8"
             variants={itemVariants}
           >
             {/* Outer rotating ring */}
@@ -85,7 +85,7 @@ export default function Home() {
             />
             {/* Inner rotating ring */}
             <motion.div
-              className="absolute inset-6 rounded-full border-2 border-dashed border-white/10"
+              className="absolute inset-5 rounded-full border-2 border-dashed border-white/10"
               animate={{ rotate: -360 }}
               transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
             />
@@ -123,13 +123,13 @@ export default function Home() {
 
             {/* Runner */}
             <motion.div
-              className="relative z-10 flex flex-col items-center"
+              className="relative z-10 flex flex-col items-center justify-center"
               animate={{ y: [0, -30, 0] }}
               transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
             >
               {/* Speed lines behind the runner */}
               <motion.div
-                className="absolute right-full top-1/2 mr-2 flex items-center gap-1.5"
+                className="absolute right-full top-1/2 mr-1.5 flex items-center gap-1.5 -translate-y-1/2"
                 animate={{ opacity: [0, 0.8, 0], x: [-8, -28, -48] }}
                 transition={{ duration: 1.1, repeat: Infinity, ease: "linear" }}
               >
