@@ -229,7 +229,7 @@ export default function Home() {
                   Treinamento
                 </p>
                 <p className="text-white font-bold text-sm sm:text-lg leading-snug">
-                  Toda Segunda-feiras e Quartas-feiras
+                  Toda Segundas-feiras e Quartas-feiras
                   <span className="text-gray-300 font-medium">
                     {" "}das 19:00Hs às 21:00Hs
                   </span>
