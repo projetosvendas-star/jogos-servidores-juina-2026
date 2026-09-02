@@ -1,6 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "corepack enable && corepack prepare pnpm@10.4.1 --activate && pnpm run build",
+  "buildCommand": "corepack enable && corepack prepare pnpm@10.4.1 --activate && pnpm install && pnpm run build",
+  "installCommand": "echo skip",
   "builds": [
     { "src": "dist/api/index.mjs", "use": "@vercel/node" },
     { "src": "dist/public/**", "use": "@vercel/static" }
