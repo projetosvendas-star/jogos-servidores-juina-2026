@@ -9,6 +9,7 @@
     { "src": "/api/(.*)", "dest": "/dist/api/index.mjs" },
     { "src": "/manus-storage/(.*)", "dest": "/dist/api/index.mjs" },
     { "src": "/assets/(.*)", "dest": "/dist/public/assets/$1" },
+    { "src": "/(.*)\\.(png|jpg|jpeg|gif|svg|webp|ico|css|js|json|txt)$", "dest": "/dist/public/$1.$2" },
     { "src": "/(.*)", "dest": "/dist/public/index.html" }
   ]
 }
