@@ -15,15 +15,15 @@ import { toast } from "sonner";
 import { SiteFooter } from "@/components/SiteFooter";
 
 const SETORES = [
-  "Administração",
+  "Administração(Prefeitura todos os setores)",
   "Educação",
   "Saúde",
   "Infraestrutura",
-  "Segurança",
   "Assistência Social",
   "Cultura",
-  "Meio Ambiente",
-  "Desenvolvimento Econômico",
+  "Daes",
+  "Secretaria de Agricultura",
+  "Secretaria de Esporte",
 ];
 
 const MODALIDADES = [
@@ -69,7 +69,6 @@ export default function Inscricao() {
   const createInscricao = trpc.inscricoes.create.useMutation();
   const isLoading = createInscricao.isPending;
   const setor = watch("setor");
-  const consentimento = watch("consentimentoDados");
   const efetivo = watch("efetivo");
 
   const validateForm = (data: FormData): boolean => {
@@ -97,10 +96,6 @@ export default function Inscricao() {
       newErrors.seguimento = "Seguimento é obrigatório";
     }
 
-    if (!data.consentimentoDados) {
-      newErrors.consentimento = "Você deve consentir com o uso dos dados pessoais";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -118,11 +113,11 @@ export default function Inscricao() {
         efetivo: data.efetivo,
         seguimento: data.seguimento,
         telefone: data.telefone,
-        consentimentoDados: data.consentimentoDados ? 1 : 0,
-        modalidades: selectedModalidades as unknown as string,
+        consentimentoDados: 1,
+        modalidades: JSON.stringify(selectedModalidades),
       });
 
-      toast.success("Inscrição realizada com sucesso! 🎉");
+      toast.success("Registro gravado!");
       setTimeout(() => setLocation("/"), 2000);
     } catch (error) {
       toast.error("Erro ao realizar inscrição. Tente novamente.");
@@ -172,7 +167,7 @@ export default function Inscricao() {
             Inscrição
           </h1>
           <p className="text-gray-300">
-            Jogos dos Servidores Público / Juína-MT 2026
+            Jogos dos Servidores Públicos / Juína-MT 2026
           </p>
         </motion.div>
 
@@ -383,44 +378,6 @@ export default function Inscricao() {
                   {errors.modalidades && (
                     <p className="text-red-400 text-sm">{errors.modalidades}</p>
                   )}
-                </motion.div>
-
-                {/* Consentimento */}
-                <motion.div
-                  className={`flex items-start space-x-3 p-4 rounded-lg border ${
-                    errors.consentimento
-                      ? "bg-red-500/10 border-red-500/20"
-                      : "bg-blue-500/10 border-blue-500/20"
-                  }`}
-                  variants={itemVariants}
-                >
-                  <Checkbox
-                    id="consentimento"
-                    checked={consentimento}
-                    onCheckedChange={(checked) => {
-                      setValue("consentimentoDados", !!checked);
-                      if (checked) {
-                        setErrors((prev) => {
-                          const newErrors = { ...prev };
-                          delete newErrors.consentimento;
-                          return newErrors;
-                        });
-                      }
-                    }}
-                  />
-                  <div className="flex-1">
-                    <Label
-                      htmlFor="consentimento"
-                      className="text-gray-300 cursor-pointer text-sm leading-relaxed"
-                    >
-                      Eu concordo com a utilização dos meus dados pessoais para fins
-                      de inscrição e comunicação sobre os Jogos dos Servidores Público
-                      / Juína-MT 2026 *
-                    </Label>
-                    {errors.consentimento && (
-                      <p className="text-red-400 text-sm mt-2">{errors.consentimento}</p>
-                    )}
-                  </div>
                 </motion.div>
 
                 {/* Submit Button */}

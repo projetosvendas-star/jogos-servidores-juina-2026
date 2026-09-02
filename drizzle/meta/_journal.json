@@ -8,6 +8,13 @@
       "when": 1786450501183,
       "tag": "0000_amusing_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786472522433,
+      "tag": "0001_add-inscricao-modalidades",
+      "breakpoints": true
     }
   ]
 }

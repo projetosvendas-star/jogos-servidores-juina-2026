@@ -200,15 +200,15 @@ describe("inscricoes.create", () => {
     const ctx = createPublicContext();
     const caller = appRouter.createCaller(ctx);
     const setores = [
-      "Administração",
+      "Administração(Prefeitura todos os setores)",
       "Educação",
       "Saúde",
       "Infraestrutura",
-      "Segurança",
       "Assistência Social",
       "Cultura",
-      "Meio Ambiente",
-      "Desenvolvimento Econômico",
+      "Daes",
+      "Secretaria de Agricultura",
+      "Secretaria de Esporte",
     ];
 
     for (const setor of setores) {

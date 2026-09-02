@@ -1,6 +1,13 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { InsertUser, users, inscricoes, InsertInscricao } from "../drizzle/schema";
+import {
+  InsertUser,
+  users,
+  inscricoes,
+  InsertInscricao,
+  inscricaoModalidades,
+  InsertInscricaoModalidade,
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -121,7 +128,31 @@ export async function createInscricao(inscricao: InsertInscricao) {
   if (!db) {
     throw new Error("Database not available");
   }
-  const result = await db.insert(inscricoes).values(inscricao);
+
+  let modalidadeIds: string[] = [];
+  try {
+    const parsed = JSON.parse(inscricao.modalidades);
+    if (Array.isArray(parsed)) {
+      modalidadeIds = parsed.filter((m): m is string => typeof m === "string");
+    }
+  } catch {
+    modalidadeIds = [];
+  }
+
+  const result = await db.transaction(async (tx) => {
+    const [created] = await tx.insert(inscricoes).values(inscricao).returning();
+
+    if (modalidadeIds.length > 0) {
+      const rows: InsertInscricaoModalidade[] = modalidadeIds.map((modalidade) => ({
+        inscricaoId: created.id,
+        modalidade,
+      }));
+      await tx.insert(inscricaoModalidades).values(rows);
+    }
+
+    return created;
+  });
+
   return result;
 }
 
@@ -130,7 +161,42 @@ export async function getInscricoes() {
   if (!db) {
     throw new Error("Database not available");
   }
-  return db.select().from(inscricoes).orderBy(inscricoes.createdAt);
+  const inscricoesList = await db.select().from(inscricoes).orderBy(inscricoes.createdAt);
+
+  const modalidadeRows = await db.select().from(inscricaoModalidades).orderBy(inscricaoModalidades.id);
+
+  return inscricoesList.map((insc) => ({
+    ...insc,
+    modalidadeRecords: modalidadeRows
+      .filter((row) => row.inscricaoId === insc.id)
+      .map((row) => row.modalidade),
+  }));
+}
+
+export async function getInscricoesByModalidade() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const inscricoesList = await db.select().from(inscricoes).orderBy(inscricoes.createdAt);
+  const modalidadeRows = await db.select().from(inscricaoModalidades).orderBy(inscricaoModalidades.id);
+
+  const byId = new Map<number, typeof inscricoesList[number]>();
+  inscricoesList.forEach((insc) => byId.set(insc.id, insc));
+
+  const rows: Array<{
+    inscricao: typeof inscricoesList[number];
+    modalidade: string;
+  }> = [];
+
+  for (const row of modalidadeRows) {
+    const insc = byId.get(row.inscricaoId);
+    if (insc) {
+      rows.push({ inscricao: insc, modalidade: row.modalidade });
+    }
+  }
+
+  return rows;
 }
 
 export async function getInscricaoById(id: number) {
