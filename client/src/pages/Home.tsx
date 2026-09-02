@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Trophy, Zap, Shield, Users } from "lucide-react";
+import { Trophy, Zap, Users } from "lucide-react";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export default function Home() {
@@ -66,29 +66,21 @@ export default function Home() {
           initial="hidden"
           animate="visible"
         >
-          {/* Trophy Icon */}
+          {/* Images */}
           <motion.div
-            className="flex justify-center mb-8"
-            animate={{
-              y: [0, -20, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-            }}
+            className="flex justify-center mb-8 gap-6 flex-wrap"
+            variants={itemVariants}
           >
-            <motion.div
-              animate={{
-                scale: [1, 1.05, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-              }}
-              className="relative"
-            >
-              <Trophy className="w-20 h-20 text-yellow-400 drop-shadow-lg" />
-            </motion.div>
+            <img
+              src="/imagem.png"
+              alt="Imagem 1"
+              className="w-40 h-40 sm:w-52 sm:h-52 object-cover rounded-xl shadow-lg border border-white/20"
+            />
+            <img
+              src="/chatgpt-image.png"
+              alt="Imagem 2"
+              className="w-40 h-40 sm:w-52 sm:h-52 object-cover rounded-xl shadow-lg border border-white/20"
+            />
           </motion.div>
 
           {/* Main Title */}
@@ -103,7 +95,7 @@ export default function Home() {
             className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 via-orange-400 to-red-400 bg-clip-text text-transparent mb-6"
             variants={itemVariants}
           >
-            Público / Juína-MT 2026
+            Públicos / Juína-MT 2026
           </motion.h2>
 
           {/* Subtitle */}
@@ -116,7 +108,7 @@ export default function Home() {
 
           {/* Features Grid */}
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12"
             variants={containerVariants}
           >
             {[
@@ -134,11 +126,6 @@ export default function Home() {
                 icon: Zap,
                 title: "Energia",
                 description: "Espírito esportivo",
-              },
-              {
-                icon: Shield,
-                title: "Segurança",
-                description: "Dados protegidos",
               },
             ].map((feature, index) => (
               <motion.div
