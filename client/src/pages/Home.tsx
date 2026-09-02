@@ -152,16 +152,30 @@ export default function Home() {
             className="flex justify-center mb-8 gap-6 flex-wrap"
             variants={itemVariants}
           >
-            <img
-              src="/imagem.png"
-              alt="Imagem 1"
-              className="w-40 h-40 sm:w-52 sm:h-52 object-cover rounded-xl shadow-lg border border-white/20"
-            />
-            <img
-              src="/chatgpt-image.png"
-              alt="Imagem 2"
-              className="w-40 h-40 sm:w-52 sm:h-52 object-cover rounded-xl shadow-lg border border-white/20"
-            />
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => window.open("/imagem.png", "_blank")}
+              className="cursor-pointer"
+            >
+              <img
+                src="/imagem.png"
+                alt="Imagem 1"
+                className="w-40 h-40 sm:w-52 sm:h-52 object-cover rounded-xl shadow-lg border border-white/20 hover:border-white/40 transition-all duration-300"
+              />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => window.open("/chatgpt-image.png", "_blank")}
+              className="cursor-pointer"
+            >
+              <img
+                src="/chatgpt-image.png"
+                alt="Imagem 2"
+                className="w-40 h-40 sm:w-52 sm:h-52 object-cover rounded-xl shadow-lg border border-white/20 hover:border-white/40 transition-all duration-300"
+              />
+            </motion.button>
           </motion.div>
 
           <motion.h1
