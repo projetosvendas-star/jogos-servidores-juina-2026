@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
@@ -13,6 +14,7 @@ const orbitBalls = [
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -155,7 +157,7 @@ export default function Home() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => window.open("/imagem.png", "_blank")}
+              onClick={() => setLightbox("/imagem.png")}
               className="cursor-pointer"
             >
               <img
@@ -167,7 +169,7 @@ export default function Home() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => window.open("/chatgpt-image.png", "_blank")}
+              onClick={() => setLightbox("/chatgpt-image.png")}
               className="cursor-pointer"
             >
               <img
@@ -273,6 +275,30 @@ export default function Home() {
           </motion.div>
         </motion.div>
       </div>
+
+      {lightbox && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={() => setLightbox(null)}
+        >
+          <motion.img
+            src={lightbox}
+            alt="Imagem ampliada"
+            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+          />
+          <button
+            onClick={() => setLightbox(null)}
+            className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white text-2xl hover:bg-white/20 transition-all duration-300"
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
+        </motion.div>
+      )}
 
       <SiteFooter />
     </div>
