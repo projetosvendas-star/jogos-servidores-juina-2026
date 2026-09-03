@@ -27,6 +27,10 @@ const MODALIDADES = [
   { id: "basquete-f", label: "Basquetebol Arremesso Feminino", categoria: "Basquetebol" },
   { id: "corrida-m", label: "Corrida de Rua Masculina", categoria: "Corrida" },
   { id: "corrida-f", label: "Corrida de Rua Feminina", categoria: "Corrida" },
+  { id: "queimada-m", label: "Queimada Masculina", categoria: "Queimada" },
+  { id: "queimada-f", label: "Queimada Feminina", categoria: "Queimada" },
+  { id: "truco-m", label: "Truco Masculino", categoria: "Truco" },
+  { id: "truco-f", label: "Truco Feminino", categoria: "Truco" },
 ];
 
 function modalidadeInfo(id: string) {
@@ -77,7 +81,7 @@ export function exportModalidadesReport(
     }
   }
 
-  const order = ["Futsal", "Voleibol", "Basquetebol", "Corrida"];
+  const order = ["Futsal", "Voleibol", "Basquetebol", "Corrida", "Queimada", "Truco"];
   const sorted = Object.values(groups)
     .filter((g) => !categoria || g.categoria === categoria)
     .sort((a, b) => order.indexOf(a.categoria) - order.indexOf(b.categoria));

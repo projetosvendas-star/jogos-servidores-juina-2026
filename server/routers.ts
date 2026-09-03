@@ -28,6 +28,10 @@ const MODALIDADES_VALIDAS = [
   "basquete-f",
   "corrida-m",
   "corrida-f",
+  "queimada-m",
+  "queimada-f",
+  "truco-m",
+  "truco-f",
 ];
 
 const inscricaoSchema = z.object({
