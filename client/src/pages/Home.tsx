@@ -178,6 +178,18 @@ export default function Home() {
                 className="w-40 h-40 sm:w-52 sm:h-52 object-cover rounded-xl shadow-lg border border-white/20 hover:border-white/40 transition-all duration-300"
               />
             </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setLightbox("/Screenshot_2.png")}
+              className="cursor-pointer"
+            >
+              <img
+                src="/Screenshot_2.png"
+                alt="Modalidades - Queimada e Truco"
+                className="w-40 h-40 sm:w-52 sm:h-52 object-cover rounded-xl shadow-lg border border-white/20 hover:border-white/40 transition-all duration-300"
+              />
+            </motion.button>
           </motion.div>
 
           <motion.h1
