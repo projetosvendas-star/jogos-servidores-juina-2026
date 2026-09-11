@@ -45,7 +45,7 @@ interface FormData {
   nomeCompleto: string;
   setor: string;
   efetivo: "Sim" | "Não";
-  seguimento: "Seletivo" | "Coopervale" | "Ágape";
+  seguimento?: "Seletivo" | "Coopervale" | "Ágape" | "Comissionado";
   telefone: string;
   consentimentoDados: boolean;
 }
@@ -65,7 +65,7 @@ export default function Inscricao() {
     mode: "onBlur",
     defaultValues: {
       efetivo: "Sim",
-      seguimento: "Seletivo",
+      seguimento: undefined,
       consentimentoDados: false,
     },
   });
@@ -100,6 +100,10 @@ export default function Inscricao() {
       newErrors.seguimento = "Seguimento é obrigatório";
     }
 
+    if (data.efetivo === "Sim") {
+      delete newErrors.seguimento;
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -115,7 +119,7 @@ export default function Inscricao() {
         nomeCompleto: data.nomeCompleto,
         setor: data.setor,
         efetivo: data.efetivo,
-        seguimento: data.seguimento,
+        seguimento: data.efetivo === "Não" ? data.seguimento : undefined,
         telefone: data.telefone,
         consentimentoDados: 1,
         modalidades: JSON.stringify(selectedModalidades),
@@ -254,6 +258,9 @@ export default function Inscricao() {
                           return newErrors;
                         });
                       }
+                      if (value === "Sim") {
+                        setValue("seguimento", undefined);
+                      }
                     }}
                     defaultValue="Sim"
                   >
@@ -285,7 +292,7 @@ export default function Inscricao() {
                     </Label>
                     <Select
                       onValueChange={(value) => {
-                        setValue("seguimento", value as "Seletivo" | "Coopervale" | "Ágape");
+                        setValue("seguimento", value as "Seletivo" | "Coopervale" | "Ágape" | "Comissionado");
                         if (value) {
                           setErrors((prev) => {
                             const newErrors = { ...prev };
@@ -311,6 +318,9 @@ export default function Inscricao() {
                         </SelectItem>
                         <SelectItem value="Ágape" className="text-white">
                           Ágape
+                        </SelectItem>
+                        <SelectItem value="Comissionado" className="text-white">
+                          Comissionado
                         </SelectItem>
                       </SelectContent>
                     </Select>

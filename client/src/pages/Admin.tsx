@@ -128,7 +128,7 @@ export default function Admin() {
         insc.nomeCompleto,
         insc.setor,
         insc.efetivo,
-        insc.seguimento,
+        insc.seguimento ?? "",
         insc.telefone,
         insc.modalidades,
         new Date(insc.createdAt).toLocaleString("pt-BR"),
@@ -469,7 +469,7 @@ export default function Admin() {
                             </span>
                           </TableCell>
                           <TableCell className="text-gray-300">
-                            {insc.seguimento}
+                            {insc.seguimento ?? "—"}
                           </TableCell>
                           <TableCell className="text-gray-300">
                             {insc.telefone}

@@ -15,6 +15,13 @@
       "when": 1786472522433,
       "tag": "0001_add-inscricao-modalidades",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789138796145,
+      "tag": "0002_fancy_shiva",
+      "breakpoints": true
     }
   ]
 }

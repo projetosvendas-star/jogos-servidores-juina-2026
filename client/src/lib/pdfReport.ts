@@ -6,7 +6,7 @@ export interface ReportInscricao {
   nomeCompleto: string;
   setor: string;
   efetivo: "Sim" | "Não";
-  seguimento: "Seletivo" | "Coopervale" | "Ágape";
+  seguimento?: "Seletivo" | "Coopervale" | "Ágape" | "Comissionado" | null;
   telefone: string;
   modalidades: string;
   createdAt: string | Date;
@@ -153,7 +153,7 @@ export function exportModalidadesReport(
         p.inscricao.nomeCompleto,
         p.inscricao.setor,
         p.inscricao.efetivo,
-        p.inscricao.seguimento,
+        p.inscricao.seguimento ?? "—",
         p.inscricao.telefone,
       ]),
       didDrawPage: (data) => {
@@ -261,7 +261,7 @@ export function exportModalidadeReport(
         r.inscricao.nomeCompleto,
         r.inscricao.setor,
         r.inscricao.efetivo,
-        r.inscricao.seguimento,
+        r.inscricao.seguimento ?? "—",
         r.inscricao.telefone,
       ]),
       styles: {

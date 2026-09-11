@@ -11,7 +11,7 @@ import {
 
 export const roleEnum = pgEnum("role", ["user", "admin"]);
 export const efetivoEnum = pgEnum("efetivo", ["Sim", "Não"]);
-export const seguimentoEnum = pgEnum("seguimento", ["Seletivo", "Coopervale", "Ágape"]);
+export const seguimentoEnum = pgEnum("seguimento", ["Seletivo", "Coopervale", "Ágape", "Comissionado"]);
 
 /**
  * Core user table backing auth flow.
@@ -46,7 +46,7 @@ export const inscricoes = pgTable("inscricoes", {
   nomeCompleto: varchar("nomeCompleto", { length: 255 }).notNull(),
   setor: varchar("setor", { length: 100 }).notNull(),
   efetivo: efetivoEnum("efetivo").notNull(),
-  seguimento: seguimentoEnum("seguimento").notNull(),
+  seguimento: seguimentoEnum("seguimento"),
   telefone: varchar("telefone", { length: 20 }).notNull(),
   consentimentoDados: integer("consentimentoDados").notNull(), // 1 = true, 0 = false
   modalidades: text("modalidades").notNull(), // JSON array

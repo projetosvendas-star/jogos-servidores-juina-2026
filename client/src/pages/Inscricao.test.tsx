@@ -103,7 +103,14 @@ describe("Inscricao Form Validation", () => {
 
     it("should validate seguimento is selected", () => {
       const seguimento = "Seletivo";
-      const validValues = ["Seletivo", "Coopervale", "Ágape"];
+      const validValues = ["Seletivo", "Coopervale", "Ágape", "Comissionado"];
+      const isValid = validValues.includes(seguimento);
+      expect(isValid).toBe(true);
+    });
+
+    it("should accept Comissionado seguimento", () => {
+      const seguimento = "Comissionado";
+      const validValues = ["Seletivo", "Coopervale", "Ágape", "Comissionado"];
       const isValid = validValues.includes(seguimento);
       expect(isValid).toBe(true);
     });

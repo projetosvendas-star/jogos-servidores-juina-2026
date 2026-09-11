@@ -38,7 +38,7 @@ const inscricaoSchema = z.object({
   nomeCompleto: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(255),
   setor: z.string().refine((val) => SETORES.includes(val), "Setor inválido"),
   efetivo: z.enum(["Sim", "Não"]),
-  seguimento: z.enum(["Seletivo", "Coopervale", "Ágape"]),
+  seguimento: z.enum(["Seletivo", "Coopervale", "Ágape", "Comissionado"]).optional(),
   telefone: z.string().min(10, "Telefone inválido").max(20),
   consentimentoDados: z.number().refine((val) => val === 1, {
     message: "Consentimento é obrigatório",
@@ -59,7 +59,7 @@ export const inscricaoFiltersSchema = z.object({
   search: z.string().optional(),
   setor: z.string().optional(),
   efetivo: z.enum(["Sim", "Não"]).optional(),
-  seguimento: z.enum(["Seletivo", "Coopervale", "Ágape"]).optional(),
+  seguimento: z.enum(["Seletivo", "Coopervale", "Ágape", "Comissionado"]).optional(),
 });
 
 export const appRouter = router({
@@ -163,7 +163,7 @@ export const appRouter = router({
             nomeCompleto: input.nomeCompleto,
             setor: input.setor,
             efetivo: input.efetivo as 'Sim' | 'Não',
-            seguimento: input.seguimento as 'Seletivo' | 'Coopervale' | 'Ágape',
+            seguimento: input.seguimento as 'Seletivo' | 'Coopervale' | 'Ágape' | 'Comissionado' | undefined,
             telefone: input.telefone,
             consentimentoDados: input.consentimentoDados,
             modalidades: input.modalidades,
