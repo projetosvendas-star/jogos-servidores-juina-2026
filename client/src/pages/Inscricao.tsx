@@ -35,10 +35,8 @@ const MODALIDADES = [
   { id: "basquete-f", label: "Basquetebol Arremesso Feminino", categoria: "Basquetebol" },
   { id: "corrida-m", label: "Corrida de Rua Masculina", categoria: "Corrida" },
   { id: "corrida-f", label: "Corrida de Rua Feminina", categoria: "Corrida" },
-  { id: "queimada-m", label: "Queimada Masculina", categoria: "Queimada" },
-  { id: "queimada-f", label: "Queimada Feminina", categoria: "Queimada" },
-  { id: "truco-m", label: "Truco Masculino", categoria: "Truco" },
-  { id: "truco-f", label: "Truco Feminino", categoria: "Truco" },
+  { id: "queimada-misto", label: "Queimada Mista", categoria: "Queimada" },
+  { id: "truco-misto", label: "Truco Misto", categoria: "Truco" },
 ];
 
 interface FormData {
